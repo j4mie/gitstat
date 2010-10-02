@@ -53,7 +53,13 @@ unset($config['General']);
 // Config now only contains repository data
 $repos = $config;
 
-$output_data = array();
+// Set timezone
+date_default_timezone_set('Europe/London');
+
+$output_data = array(
+    'last_updated' => date('H:i, l jS F Y'),
+    'repositories' => array(),
+);
 
 foreach ($repos as $name => $repo) {
     $checker = new RepoChecker($repo['path']);
@@ -65,7 +71,7 @@ foreach ($repos as $name => $repo) {
         'dirty' => $checker->is_dirty(),
         'out_of_sync' => $checker->is_out_of_sync_with($repo['remote']),
     );
-    $output_data[] = $repo_data;
+    $output_data['repositories'][] = $repo_data;
 }
 
 file_put_contents($general_config['output_file'], json_encode($output_data), LOCK_EX);

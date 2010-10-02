@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GitStat</title>
+    <title>Git Repository Status</title>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://github.com/premasagar/tim/raw/master/tim.min.js"></script>
 
@@ -14,6 +14,10 @@
             width: 600px;
             margin-left: 250px;
             padding-top: 50px;
+        }
+
+        p#last_updated {
+            margin: 0 0 10px 20px;
         }
 
         ul#repository_list {
@@ -60,7 +64,7 @@
         <li>
             <h2>{{name}}</h2>
             <div class="repository_info">
-                <p class="info">Path: {{path}}</p>
+                <p class="info">Local path: {{path}}</p>
                 <p class="info">Remote <span>{{remote_name}}</span>: {{remote_url}}</p>
             </div>
             <p class="{{dirty_class}}">{{dirty_text}}</p>
@@ -86,7 +90,8 @@
                 IN_SYNC_CLASS = 'in_sync';
 
             $.getJSON('output/status.json', function (data) {
-                $.each(data, function (index, repository) {
+                $('p#last_updated').text("Last updated: " + data.last_updated);
+                $.each(data.repositories, function (index, repository) {
                     $.extend(repository, {
                         dirty_class: repository.dirty ? DIRTY_CLASS : CLEAN_CLASS,
                         dirty_text: repository.dirty ? DIRTY_TEXT : CLEAN_TEXT,
@@ -102,6 +107,7 @@
 </head>
 <body>
     <h1>Git Repository Status</h1>
+    <p id="last_updated"></p>
 
     <ul id="repository_list">
         <li>Loading...</li>

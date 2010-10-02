@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitStat</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://github.com/premasagar/tim/raw/master/tim.min.js"></script>
+
+    <link rel="stylesheet" text="text/css" href="http://github.com/joshuaclayton/blueprint-css/raw/master/blueprint/src/reset.css" />
+    <link rel="stylesheet" text="text/css" href="http://github.com/joshuaclayton/blueprint-css/raw/master/blueprint/src/typography.css" />
+
+    <style type="text/css">
+
+        body {
+            width: 600px;
+            margin-left: 250px;
+            padding-top: 50px;
+        }
+
+        ul#repository_list {
+            list-style-type: none;
+        }
+
+        ul#repository_list li {
+            margin-bottom: 20px;
+        }
+
+        ul#repository_list li h2 {
+            margin: 0;
+        }
+
+        ul#repository_list li div.repository_info {
+            color: grey;
+            font-size: 80%;
+            margin: 0 0 5px 0;
+        }
+
+        ul#repository_list li p {
+            margin: 0;
+        }
+
+        ul#repository_list li p.dirty {
+            color: red;
+        }
+
+        ul#repository_list li p.clean {
+            color: green;
+        }
+
+        ul#repository_list li p.out_of_sync {
+            color: red;
+        }
+
+        ul#repository_list li p.in_sync {
+            color: green;
+        }
+
+    </style>
+
+    <script type="text/template" id="repository_template">
+        <li>
+            <h2>{{name}}</h2>
+            <div class="repository_info">
+                <p class="info">Path: {{path}}</p>
+                <p class="info">Remote <span>{{remote_name}}</span>: {{remote_url}}</p>
+            </div>
+            <p class="{{dirty_class}}">{{dirty_text}}</p>
+            <p class="{{sync_class}}">{{sync_text}}</p>
+        </li>
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var list = $('ul#repository_list'),
+                html_template = $('script#repository_template').html(),
+                repositories = [],
+
+                DIRTY_TEXT = 'This repository has uncommited changes',
+                DIRTY_CLASS = 'dirty',
+                CLEAN_TEXT = 'This repository has no uncommitted changes',
+                CLEAN_CLASS = 'clean',
+
+                OUT_OF_SYNC_TEXT = 'This repository is out of sync with the remote',
+                OUT_OF_SYNC_CLASS = 'out_of_sync',
+                IN_SYNC_TEXT = 'This repository is in sync with the remote'
+                IN_SYNC_CLASS = 'in_sync';
+
+            $.getJSON('output/status.json', function (data) {
+                $.each(data, function (index, repository) {
+                    $.extend(repository, {
+                        dirty_class: repository.dirty ? DIRTY_CLASS : CLEAN_CLASS,
+                        dirty_text: repository.dirty ? DIRTY_TEXT : CLEAN_TEXT,
+                        sync_class: repository.out_of_sync ? OUT_OF_SYNC_CLASS : IN_SYNC_CLASS,
+                        sync_text: repository.out_of_sync ? OUT_OF_SYNC_TEXT : IN_SYNC_TEXT
+                    });
+                    repositories.push(tim(html_template, repository));
+                });
+                list.html(repositories.join(''));
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Git Repository Status</h1>
+
+    <ul id="repository_list">
+        <li>Loading...</li>
+    </ul>
+</body>
+
+</html>

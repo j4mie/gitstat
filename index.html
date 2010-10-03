@@ -24,9 +24,10 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
+            $.ajaxSetup({cache: false});
+
             var list = $('ul#repository_list'),
                 html_template = $('script#repository_template').html(),
-                repositories = [],
 
                 DIRTY_TEXT = 'This repository has uncommited changes',
                 DIRTY_CLASS = 'dirty',
@@ -38,19 +39,26 @@
                 IN_SYNC_TEXT = 'This repository is in sync with the remote'
                 IN_SYNC_CLASS = 'in_sync';
 
-            $.getJSON('output/status.json', function (data) {
-                $('p#last_updated').text("Last updated: " + data.last_updated);
-                $.each(data.repositories, function (index, repository) {
-                    $.extend(repository, {
-                        dirty_class: repository.dirty ? DIRTY_CLASS : CLEAN_CLASS,
-                        dirty_text: repository.dirty ? DIRTY_TEXT : CLEAN_TEXT,
-                        sync_class: repository.out_of_sync ? OUT_OF_SYNC_CLASS : IN_SYNC_CLASS,
-                        sync_text: repository.out_of_sync ? OUT_OF_SYNC_TEXT : IN_SYNC_TEXT
+            $(window).bind('update', function () {
+                var repositories = [];
+                $.getJSON('output/status.json', function (data) {
+                    $('p#last_updated').text("Last updated: " + data.last_updated);
+                    $.each(data.repositories, function (index, repository) {
+                        $.extend(repository, {
+                            dirty_class: repository.dirty ? DIRTY_CLASS : CLEAN_CLASS,
+                            dirty_text: repository.dirty ? DIRTY_TEXT : CLEAN_TEXT,
+                            sync_class: repository.out_of_sync ? OUT_OF_SYNC_CLASS : IN_SYNC_CLASS,
+                            sync_text: repository.out_of_sync ? OUT_OF_SYNC_TEXT : IN_SYNC_TEXT
+                        });
+                        repositories.push(tim(html_template, repository));
                     });
-                    repositories.push(tim(html_template, repository));
+                    list.html(repositories.join(''));
                 });
-                list.html(repositories.join(''));
             });
+            $(window).trigger('update');
+            window.setInterval(function () {
+                $(window).trigger('update');
+            }, 30 * 1000);
         });
     </script>
 </head>

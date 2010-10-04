@@ -22,7 +22,7 @@ class RepoChecker {
      * Is the working tree for this repository dirty?
      */
     public function is_dirty() {
-        $command = "{$this->_git_command} {$this->_flags} status --porcelain";
+        $command = "{$this->_git_command} {$this->_flags} ls-files -m -o -d --exclude-standard";
         $output = trim(shell_exec($command));
         return $output !== '';
     }

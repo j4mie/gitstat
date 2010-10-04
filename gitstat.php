@@ -60,7 +60,7 @@ class RepoChecker {
     /**
      * Get the SHA1 of the HEAD of the given local branch (default MASTER)
      */
-    protected function _get_local_sha1($branch='MASTER') {
+    protected function _get_local_sha1($branch='master') {
         $command = "{$this->_git_command} {$this->_flags} rev-list --max-count=1 {$branch} HEAD";
         $output = trim(shell_exec($command));
         return $output;
